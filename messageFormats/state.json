@@ -1,0 +1,71 @@
+{
+  "header" : {
+      "type" : "REQUEST || UPDATE || ERROR || STOP || ACCEPTED",
+      "msg" : "Use for errors and other cases",
+      "sequence" : 1
+  },
+
+  "state" : {
+
+    "robot" : {
+      "location" : {
+        "x" : 15,
+        "y" : 0,
+        "z" : 0.0
+      },
+
+      "rotation" : {
+        "x" : 0.0,
+        "y" : 0.0,
+        "z" : 0.0
+      },
+
+      "head" : {
+        "position" : 0,
+      },
+
+      "lift" : {
+        "height" : 0.5,
+        "holding" : false
+      },
+
+      "driving" : {
+        "isMoving" : true,
+        "distance" : 12,
+        "speed" : 50,
+      },
+
+      "cubes" : [{
+        "id" : 1,
+        "lights" : [{
+            "on" : true,
+            "color" : {
+              "r" : 255,
+              "g" : 0,
+              "b" : 0
+            }
+        }],
+
+        "location" : {
+          "x" : 15,
+          "y" : 0,
+          "z" : 0.0
+        },
+
+        "rotation" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "z" : 0.0
+        }
+      }],
+  },
+
+    "events" : {
+      "tracked" : [{
+        "type" : "ROBOT || WORLD || OBJECT",
+        "triggered" : true,
+        "behavior" : "callback || NONE"
+        }],
+    }
+  }
+}

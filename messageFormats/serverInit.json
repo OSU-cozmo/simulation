@@ -1,0 +1,13 @@
+{
+  "header" : {
+      "type" : "REQUEST || UPDATE || ERROR || STOP || ACCEPTED",
+      "msg" : "Use for errors and other cases",
+      "sequence" : 1
+  },
+
+  "objects" : {
+    "name" : "gameObject name",
+    "index" : "index"
+  }
+
+}
