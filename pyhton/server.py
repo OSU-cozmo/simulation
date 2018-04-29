@@ -11,7 +11,7 @@ class Server:
     log = -1
     def __init__(self):
         """Initializes an instance of the server object."""
-
+    
         logger = logging.getLogger('SVR')
         logger.setLevel(logging.DEBUG)
 
@@ -36,12 +36,13 @@ class Server:
         asyncio.get_event_loop().run_forever()
 
     async def router(self, msg):
-
         if "JSON" not in msg:
             self.log.warning("Recieved bad message : %s\n" % msg)
         else:
             msg = msg.replace("JSON", "")
             nmsg = self.msgToDict(msg)
+            self.outBuf.append("REC %s" % nmsg['header']['msg']);
+            self.log.info("out buff = %s " % self.outBuf)
             if not nmsg:
                 self.log.error("Recieved Bad JSON : %s\n" % msg)
                 stopClean()
@@ -71,9 +72,13 @@ class Server:
             await self.router(msg.decode("utf-8"))
 
     async def outgoing(self, websocket, path):
-        msg = "hello"
-        self.log.info("Outgoing : '%s'" % msg)
-        await websocket.send(msg)
+        while True:
+            if(len(self.outBuf) > 0):
+                msg = self.outBuf.pop(0)
+                self.log.info("Outgoing : '%s'" % msg)
+                await websocket.send(msg)
+            else:
+                await asyncio.sleep(0.1)
 
     async def handler(self, websocket, path):
         self.log.info("connected to new client");

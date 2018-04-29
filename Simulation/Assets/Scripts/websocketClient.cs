@@ -34,6 +34,9 @@ public class websocketClient : MonoBehaviour {
 
 	public void Update() {
 		deltaT++;
+		string reply = w.RecvString();
+		if(reply != null)
+			Debug.Log(reply);
 		//Send stop command after update happened 300 times
 		if (deltaT > 100 && !done) {
 			header stopper = new header();
@@ -65,6 +68,7 @@ public class initMsg {
 			this.position = obj.transform.position;
 			this.rotation = obj.transform.rotation.eulerAngles;
 		}
+
 		public string getJSON() {
 
 			return JsonUtility.ToJson(this);

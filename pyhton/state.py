@@ -30,7 +30,6 @@ class worldState:
         for x in body['objects']:
             temp = worldObject(x)
             self.objects.append(x)
-            self.log.info("%s posistion is %s" % (temp.get('name'), temp.get('position')))
 
 class worldObject:
     atts = []
