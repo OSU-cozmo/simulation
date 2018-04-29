@@ -57,10 +57,17 @@ public class initMsg {
 	public class obj {
 		public int index;
 		public string name;
+		public Vector3 position, rotation;
 
-		public obj(string name, int index) {
-			this.name = name;
+		public obj(GameObject obj, int index) {
+			this.name = obj.name;
 			this.index = index;
+			this.position = obj.transform.position;
+			this.rotation = obj.transform.rotation.eulerAngles;
+		}
+		public string getJSON() {
+
+			return JsonUtility.ToJson(this);
 		}
 	}
 	public initMsg(List<GameObject> obs) {
@@ -68,17 +75,16 @@ public class initMsg {
 		header.build("INIT", "initializing world", 0);
 		objects = new List<obj>();
 		for (int i = 0; i < obs.Count; i++) {
-			objects.Add(new obj(obs[i].name, i));
+			objects.Add(new obj(obs[i], i));
 		}
 	}
 
 	public string getJson() {
-
 		string msg = "JSON{\"header\":";
 		msg += JsonUtility.ToJson(this.header);
 		msg += ",\"body\":{\"objects\":[";
 		for(int i = 0; i < objects.Count; i++) {
-			msg += JsonUtility.ToJson(objects[i]);
+			msg += objects[i].getJSON();
 			if (i != objects.Count - 1)
 				msg += ',';
 		}
