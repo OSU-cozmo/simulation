@@ -50,6 +50,10 @@ public class websocketClient : MonoBehaviour {
 			if ((res.ready && waiting != 0) || res.type == "INIT_S") {
 				getNext();
 			}
+
+			if (res.type == "CMD") {
+				Recievers[res.index].SendMessage(res.command, res.args);
+			}
 		}
 	}
 
@@ -141,6 +145,6 @@ public class Response {
 
 	public bool ready;
 	public string command;
-
-
+	public int index;
+	public string args;
 }

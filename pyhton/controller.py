@@ -13,7 +13,9 @@ def getNextCommand(body = None):
         "seq" : 0,
 
         "command" : "driveForward",
-        "ready" : True
+        "ready" : True,
+        "index" : 0,
+        "args" : "{\"args\" : [1500, 20]}"
     }
 
     str = json.dumps(command)
@@ -27,7 +29,9 @@ def initCon(body = None):
         "seq" : 0,
 
         "ready" : True,
-        "command" : "NONE"
+        "command" : "NONE",
+        "index" : -1,
+        "args" : "{}"
     }
     str = json.dumps(res)
     svr.sendMsg(str, res['msg'])

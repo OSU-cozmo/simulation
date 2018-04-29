@@ -22,10 +22,21 @@ public class drive : MonoBehaviour {
 		}
 	}
 
-	public void driveForward(float dist, float speed) {
+	public void driveForward(string args) {
+		Debug.Log("Drive Forward");
+		Debug.Log(args);
+		Args a = JsonUtility.FromJson<Args>(args);
+
 		this.startPos = this.transform.position;
 		this.direction = 1;
+		float dist = a.args[0];
 		this.distance = dist;
-		this.rb.AddRelativeForce(Vector3.forward * speed);
+		float speed = a.args[1];
+		this.rb.AddRelativeForce(Vector3.forward * speed * 30);
+	}
+
+
+	class Args {
+		public float [] args;
 	}
 }
