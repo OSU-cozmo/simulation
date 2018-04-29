@@ -11,43 +11,65 @@ public class websocketClient : MonoBehaviour {
 	public List<GameObject> Recievers;
 	int sent = 0;
 	int deltaT = 0;
+	int waiting = 0;
 	bool done = false;
+	bool init = false;
+	bool ready = false;
 	IEnumerator Start() {
 		w = new WebSocket(new Uri(String.Format("ws://localhost:{0}", port)));
 		yield return StartCoroutine(w.Connect());
 		string msg = buildInitMessage();
-		Debug.Log(msg);
+		//Debug.Log(msg);
 		w.SendString(msg);
 		int i = 0;
 		while (true) {
 			string reply = w.RecvString();
 			sent++;
 			if (reply != null) {
-				Debug.Log(reply);
-				w.SendString("Recieved message");
+				this.route(reply);
 			}
 
 			yield return i;
-
 		}
 	}
 
 	public void Update() {
 		deltaT++;
-		string reply = w.RecvString();
-		if(reply != null)
-			Debug.Log(reply);
+
 		//Send stop command after update happened 300 times
-		if (deltaT > 100 && !done) {
-			header stopper = new header();
-			stopper.build("STOP", "Stopping the server", sent);
-			string msg = "JSON{\"header\":" + JsonUtility.ToJson(stopper) + ",\"body\":{}}";
-			Debug.Log(msg);
-			w.SendString(msg);
-			done = true;
+		if (deltaT > 400 && !done) {
+			stop();
 		}
 	}
 
+	private void route(string msg) {
+		Debug.Log("routing " + msg);
+		Response res = JsonUtility.FromJson<Response>(msg);
+		if (res != null) {
+			Debug.Log(res.ready);
+			if ((res.ready && waiting != 0) || res.type == "INIT_S") {
+				getNext();
+			}
+		}
+	}
+
+	private void stop() {
+		header stopper = new header();
+		stopper.build("STOP", "Stopping the server", sent);
+		string msg = "JSON{\"header\":" + JsonUtility.ToJson(stopper) + ",\"body\":{}}";
+		//Debug.Log(msg);
+		w.SendString(msg);
+		done = true;
+	}
+	private void getNext() {
+		//Debug.Log("getting next");
+		header next = new header();
+		next.build("NEXT", "Getting the next command", sent);
+		string msg = "JSON{\"header\":" + JsonUtility.ToJson(next) + ",\"body\":{}}";
+		w.SendString(msg);
+		waiting = 0;
+		
+	}
 	private string buildInitMessage() {
 		initMsg msg = new initMsg(this.Recievers);
 		return msg.getJson();
@@ -109,4 +131,16 @@ public class header {
 		this.msg = msg;
 		this.seq = seq;
 	}
+}
+
+[Serializable]
+public class Response {
+
+	public string type, msg;
+	public int seq;
+
+	public bool ready;
+	public string command;
+
+
 }

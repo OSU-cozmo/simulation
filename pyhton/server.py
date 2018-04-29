@@ -2,6 +2,7 @@ import asyncio
 import websockets
 import json
 import logging;
+
 class Server:
 
     outBuf = []
@@ -9,26 +10,22 @@ class Server:
     lastMsg = 0
     routes = {}
     log = -1
+    producer = False
     def __init__(self):
+
         """Initializes an instance of the server object."""
-    
         logger = logging.getLogger('SVR')
         logger.setLevel(logging.DEBUG)
-
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
-
-
         formatter = logging.Formatter('%(name)s > %(levelname)s >> %(message)s')
-
-
         ch.setFormatter(formatter)
-
         logger.addHandler(ch)
         self.log = logger
         self.bind("STOP", stopClean)
 
     def start(self):
+
         self.log.info("Server starting")
         self.log.info("Currently Bound Types -> %s\n" % list(map(lambda x : x, self.routes)))
         _server = websockets.serve(self.handler, 'localhost', 8765)
@@ -41,8 +38,6 @@ class Server:
         else:
             msg = msg.replace("JSON", "")
             nmsg = self.msgToDict(msg)
-            self.outBuf.append("REC %s" % nmsg['header']['msg']);
-            self.log.info("out buff = %s " % self.outBuf)
             if not nmsg:
                 self.log.error("Recieved Bad JSON : %s\n" % msg)
                 stopClean()
@@ -50,7 +45,7 @@ class Server:
                 t = nmsg['header']['type'];
                 self.log.info("Client Message : '%s'\n" % nmsg['header']['msg'])
                 if t in self.routes:
-                    f = self.routes[t](nmsg['body'])
+                    self.routes[t](nmsg['body'])
                 else:
                     self.log.error("No behavior defined for type %s\n" % t)
                     stopClean()
@@ -58,11 +53,18 @@ class Server:
 
 
     def msgToDict(self, msg):
+
         try:
             nmsg = json.loads(msg)
         except json.JSONDecodeError as e:
             return False
         return json.loads(msg)
+
+    def sendMsg(self, msg : str, anot : str = None):
+        if anot is not None:
+            self.log.info("Sending : %s\n" % anot)
+
+        self.outBuf.append(msg);
 
     def bind(self, key, behavior):
         self.routes[key] = behavior
@@ -75,16 +77,15 @@ class Server:
         while True:
             if(len(self.outBuf) > 0):
                 msg = self.outBuf.pop(0)
-                self.log.info("Outgoing : '%s'" % msg)
                 await websocket.send(msg)
             else:
                 await asyncio.sleep(0.1)
 
     async def handler(self, websocket, path):
         self.log.info("connected to new client");
-
         inTask = asyncio.ensure_future(self.incoming(websocket, path))
         outTask = asyncio.ensure_future(self.outgoing(websocket, path))
+
         while True:
             done, pending = await asyncio.wait(
                 [inTask, outTask],

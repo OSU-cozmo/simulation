@@ -1,12 +1,8 @@
 {
-  "header" : {
-      "type" : "REQUEST || UPDATE || ERROR || STOP || ACCEPTED",
-      "msg" : "Use for errors and other cases",
-      "sequence" : 1
-  },
+    "type" : "CMD",
+    "msg" : "Next command",
+    "seq" : 0,
 
-  "commands" : [{
-    "function" : "NAME",
-    "parameters" : []
-  }]
+    "command" : "driveForward",
+    "ready" : true
 }

@@ -30,6 +30,7 @@ class worldState:
         for x in body['objects']:
             temp = worldObject(x)
             self.objects.append(x)
+            
 
 class worldObject:
     atts = []
